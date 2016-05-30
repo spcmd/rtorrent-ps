@@ -1,0 +1,402 @@
+diff -ruN orig/src/ui/download_list.cc patched/src/ui/download_list.cc
+--- orig/src/ui/download_list.cc	2016-05-27 16:23:15.406959772 +0200
++++ patched/src/ui/download_list.cc	2016-05-27 16:57:14.359056472 +0200
+@@ -5,12 +5,12 @@
+ // it under the terms of the GNU General Public License as published by
+ // the Free Software Foundation; either version 2 of the License, or
+ // (at your option) any later version.
+-// 
++//
+ // This program is distributed in the hope that it will be useful,
+ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ // GNU General Public License for more details.
+-// 
++//
+ // You should have received a copy of the GNU General Public License
+ // along with this program; if not, write to the Free Software
+ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -156,7 +156,7 @@
+     m_uiArray[m_state] = NULL;
+ 
+     break;
+-    
++
+   case DISPLAY_DOWNLOAD_LIST:
+     m_uiArray[DISPLAY_DOWNLOAD_LIST]->disable();
+ 
+@@ -170,7 +170,7 @@
+   case DISPLAY_STRING_LIST:
+     m_uiArray[m_state]->disable();
+     break;
+-    
++
+   default:
+     break;
+   }
+@@ -192,7 +192,7 @@
+ 
+       download->activate(m_frame);
+       download->slot_exit(std::bind(&DownloadList::activate_display, this, DISPLAY_DOWNLOAD_LIST));
+-    
++
+       m_uiArray[DISPLAY_DOWNLOAD] = download;
+       break;
+     }
+@@ -287,7 +287,7 @@
+ void
+ DownloadList::receive_exit_input(Input type) {
+   input::TextInput* input = control->ui()->current_input();
+-  
++
+   // We should check that this object is the one holding the input.
+   if (input == NULL)
+     return;
+@@ -349,11 +349,12 @@
+ 
+   m_uiArray[DISPLAY_LOG]->bindings()[KEY_LEFT] =
+     m_uiArray[DISPLAY_LOG]->bindings()['B' - '@'] =
+-    m_uiArray[DISPLAY_LOG]->bindings()[' '] = std::bind(&DownloadList::activate_display, this, DISPLAY_DOWNLOAD_LIST);
++    m_uiArray[DISPLAY_LOG]->bindings()[' '] =
++    m_uiArray[DISPLAY_LOG]->bindings()['h'] = std::bind(&DownloadList::activate_display, this, DISPLAY_DOWNLOAD_LIST);
+ 
+   m_uiArray[DISPLAY_DOWNLOAD_LIST]->bindings()[KEY_RIGHT] =
+-    m_uiArray[DISPLAY_DOWNLOAD_LIST]->bindings()['F' - '@'] = std::bind(&DownloadList::activate_display, this, DISPLAY_DOWNLOAD);
+-  m_uiArray[DISPLAY_DOWNLOAD_LIST]->bindings()['l'] = std::bind(&DownloadList::activate_display, this, DISPLAY_LOG);
++    m_uiArray[DISPLAY_DOWNLOAD_LIST]->bindings()['F' - '@'] =
++    m_uiArray[DISPLAY_DOWNLOAD_LIST]->bindings()['l'] = std::bind(&DownloadList::activate_display, this, DISPLAY_DOWNLOAD);
+ }
+ 
+ }
+diff -ruN orig/src/ui/element_chunks_seen.cc patched/src/ui/element_chunks_seen.cc
+--- orig/src/ui/element_chunks_seen.cc	2016-05-27 16:23:15.410293102 +0200
++++ patched/src/ui/element_chunks_seen.cc	2016-05-27 16:56:56.035241603 +0200
+@@ -5,12 +5,12 @@
+ // it under the terms of the GNU General Public License as published by
+ // the Free Software Foundation; either version 2 of the License, or
+ // (at your option) any later version.
+-// 
++//
+ // This program is distributed in the hope that it will be useful,
+ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ // GNU General Public License for more details.
+-// 
++//
+ // You should have received a copy of the GNU General Public License
+ // along with this program; if not, write to the Free Software
+ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -52,10 +52,15 @@
+   m_window(NULL),
+   m_focus(0) {
+ 
+-  m_bindings[KEY_LEFT] = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
++  m_bindings[KEY_LEFT] = m_bindings['B' - '@'] =
++  m_bindings['h'] = std::bind(&slot_type::operator(), &m_slot_exit);
++
++  m_bindings[KEY_DOWN]  = m_bindings['N' - '@'] =
++  m_bindings['j']  = std::bind(&ElementChunksSeen::receive_next, this);
++
++  m_bindings[KEY_UP]    = m_bindings['P' - '@'] =
++  m_bindings['k']    = std::bind(&ElementChunksSeen::receive_prev, this);
+ 
+-  m_bindings[KEY_DOWN]  = m_bindings['N' - '@'] = std::bind(&ElementChunksSeen::receive_next, this);
+-  m_bindings[KEY_UP]    = m_bindings['P' - '@'] = std::bind(&ElementChunksSeen::receive_prev, this);
+   m_bindings[KEY_NPAGE] = std::bind(&ElementChunksSeen::receive_pagenext, this);
+   m_bindings[KEY_PPAGE] = std::bind(&ElementChunksSeen::receive_pageprev, this);
+ }
+@@ -143,7 +148,7 @@
+     m_focus = 0;
+   else if (m_focus + visible / 2 < maxFocus)
+     m_focus += visible / 2;
+-  else 
++  else
+     m_focus = maxFocus;
+ 
+   m_window->mark_dirty();
+diff -ruN orig/src/ui/element_download_list.cc patched/src/ui/element_download_list.cc
+--- orig/src/ui/element_download_list.cc	2016-05-27 16:23:15.410293102 +0200
++++ patched/src/ui/element_download_list.cc	2016-05-27 16:56:45.147061586 +0200
+@@ -5,12 +5,12 @@
+ // it under the terms of the GNU General Public License as published by
+ // the Free Software Foundation; either version 2 of the License, or
+ // (at your option) any later version.
+-// 
++//
+ // This program is distributed in the hope that it will be useful,
+ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ // GNU General Public License for more details.
+-// 
++//
+ // You should have received a copy of the GNU General Public License
+ // along with this program; if not, write to the Free Software
+ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -97,8 +97,9 @@
+   m_bindings['9']           = std::bind(&ElementDownloadList::receive_change_view, this, "leeching");
+   m_bindings['0']           = std::bind(&ElementDownloadList::receive_change_view, this, "active");
+ 
+-  m_bindings[KEY_UP]   = m_bindings['P' - '@'] = std::bind(&ElementDownloadList::receive_prev, this);
+-  m_bindings[KEY_DOWN] = m_bindings['N' - '@'] = std::bind(&ElementDownloadList::receive_next, this);
++  m_bindings[KEY_UP]   = m_bindings['k'] = m_bindings['P' - '@'] = std::bind(&ElementDownloadList::receive_prev, this);
++  m_bindings[KEY_DOWN] = m_bindings['j'] = m_bindings['N' - '@'] = std::bind(&ElementDownloadList::receive_next, this);
++
+ }
+ 
+ void
+diff -ruN orig/src/ui/element_file_list.cc patched/src/ui/element_file_list.cc
+--- orig/src/ui/element_file_list.cc	2016-05-27 16:23:15.410293102 +0200
++++ patched/src/ui/element_file_list.cc	2016-05-27 16:56:37.198451995 +0200
+@@ -5,12 +5,12 @@
+ // it under the terms of the GNU General Public License as published by
+ // the Free Software Foundation; either version 2 of the License, or
+ // (at your option) any later version.
+-// 
++//
+ // This program is distributed in the hope that it will be useful,
+ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ // GNU General Public License for more details.
+-// 
++//
+ // You should have received a copy of the GNU General Public License
+ // along with this program; if not, write to the Free Software
+ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -63,8 +63,8 @@
+   m_selected(iterator(d->download()->file_list()->begin())),
+   m_collapsed(false) {
+ 
+-  m_bindings[KEY_LEFT]  = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
+-  m_bindings[KEY_RIGHT] = m_bindings['F' - '@'] = std::bind(&ElementFileList::receive_select, this);
++  m_bindings[KEY_LEFT]  = m_bindings['h'] = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
++  m_bindings[KEY_RIGHT] = m_bindings['l'] = m_bindings['F' - '@'] = std::bind(&ElementFileList::receive_select, this);
+ 
+   m_bindings[' '] = std::bind(&ElementFileList::receive_priority, this);
+   m_bindings['*'] = std::bind(&ElementFileList::receive_change_all, this);
+@@ -72,8 +72,8 @@
+   m_bindings[KEY_NPAGE] = std::bind(&ElementFileList::receive_pagenext, this);
+   m_bindings[KEY_PPAGE] = std::bind(&ElementFileList::receive_pageprev, this);
+ 
+-  m_bindings[KEY_DOWN] = m_bindings['N' - '@'] = std::bind(&ElementFileList::receive_next, this);
+-  m_bindings[KEY_UP]   = m_bindings['P' - '@'] = std::bind(&ElementFileList::receive_prev, this);
++  m_bindings[KEY_DOWN] = m_bindings['j'] = m_bindings['N' - '@'] = std::bind(&ElementFileList::receive_next, this);
++  m_bindings[KEY_UP]   = m_bindings['k'] = m_bindings['P' - '@'] = std::bind(&ElementFileList::receive_prev, this);
+ }
+ 
+ inline ElementText*
+@@ -87,10 +87,10 @@
+ 
+   element->push_back("File info:");
+   element->push_back("");
+-  
++
+   element->push_column("Filename:", te_command("fi.filename_last="));
+   element->push_back("");
+-  
++
+   element->push_column("Size:",   te_command("if=$fi.is_file=,$convert.xb=$f.size_bytes=,---"));
+   element->push_column("Chunks:", te_command("cat=$f.completed_chunks=,\" / \",$f.size_chunks="));
+   element->push_column("Range:",  te_command("cat=$f.range_first=,\" - \",$f.range_second="));
+@@ -267,7 +267,7 @@
+ 
+   torrent::priority_t priority = torrent::priority_t((m_selected.file()->priority() + 2) % 3);
+ 
+-  iterator first = m_selected; 
++  iterator first = m_selected;
+   iterator last = m_selected;
+   last.forward_current_depth();
+ 
+diff -ruN orig/src/ui/element_menu.cc patched/src/ui/element_menu.cc
+--- orig/src/ui/element_menu.cc	2016-05-27 16:23:15.410293102 +0200
++++ patched/src/ui/element_menu.cc	2016-05-27 16:56:24.214174270 +0200
+@@ -5,12 +5,12 @@
+ // it under the terms of the GNU General Public License as published by
+ // the Free Software Foundation; either version 2 of the License, or
+ // (at your option) any later version.
+-// 
++//
+ // This program is distributed in the hope that it will be useful,
+ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ // GNU General Public License for more details.
+-// 
++//
+ // You should have received a copy of the GNU General Public License
+ // along with this program; if not, write to the Free Software
+ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -72,11 +72,10 @@
+   m_entry(entry_invalid) {
+ 
+   // Move bindings into a function that defines default bindings.
+-  m_bindings[KEY_LEFT]  = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
+-  m_bindings[KEY_RIGHT] = m_bindings['F' - '@'] = std::bind(&ElementMenu::entry_select, this);
+-
+-  m_bindings[KEY_UP]   = m_bindings['P' - '@'] = std::bind(&ElementMenu::entry_prev, this);
+-  m_bindings[KEY_DOWN] = m_bindings['N' - '@'] = std::bind(&ElementMenu::entry_next, this);
++  m_bindings[KEY_LEFT]  = m_bindings['h'] = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
++  m_bindings[KEY_RIGHT] = m_bindings['l'] = m_bindings['F' - '@'] = std::bind(&ElementMenu::entry_select, this);
++  m_bindings[KEY_UP]   = m_bindings['k'] = m_bindings['P' - '@'] = std::bind(&ElementMenu::entry_prev, this);
++  m_bindings[KEY_DOWN] = m_bindings['j'] = m_bindings['N' - '@'] = std::bind(&ElementMenu::entry_next, this);
+ }
+ 
+ ElementMenu::~ElementMenu() {
+@@ -135,7 +134,7 @@
+     return;
+ 
+   unfocus_entry(m_entry);
+-  
++
+   if (++m_entry >= size())
+     m_entry = 0;
+ 
+diff -ruN orig/src/ui/element_peer_list.cc patched/src/ui/element_peer_list.cc
+--- orig/src/ui/element_peer_list.cc	2016-05-27 16:23:15.410293102 +0200
++++ patched/src/ui/element_peer_list.cc	2016-05-27 16:56:05.542267084 +0200
+@@ -5,12 +5,12 @@
+ // it under the terms of the GNU General Public License as published by
+ // the Free Software Foundation; either version 2 of the License, or
+ // (at your option) any later version.
+-// 
++//
+ // This program is distributed in the hope that it will be useful,
+ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ // GNU General Public License for more details.
+-// 
++//
+ // You should have received a copy of the GNU General Public License
+ // along with this program; if not, write to the Free Software
+ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -76,14 +76,13 @@
+ 
+   m_elementInfo->slot_exit(std::bind(&ElementPeerList::activate_display, this, DISPLAY_LIST));
+ 
+-  m_bindings['k']       = std::bind(&ElementPeerList::receive_disconnect_peer, this);
++  m_bindings['K']       = std::bind(&ElementPeerList::receive_disconnect_peer, this);
+   m_bindings['*']       = std::bind(&ElementPeerList::receive_snub_peer, this);
+   m_bindings['B']       = std::bind(&ElementPeerList::receive_ban_peer, this);
+-  m_bindings[KEY_LEFT]  = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
+-  m_bindings[KEY_RIGHT] = m_bindings['F' - '@'] = std::bind(&ElementPeerList::activate_display, this, DISPLAY_INFO);
+-
+-  m_bindings[KEY_UP]   = m_bindings['P' - '@'] = std::bind(&ElementPeerList::receive_prev, this);
+-  m_bindings[KEY_DOWN] = m_bindings['N' - '@'] = std::bind(&ElementPeerList::receive_next, this);
++  m_bindings[KEY_LEFT]  = m_bindings['h'] = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
++  m_bindings[KEY_RIGHT] = m_bindings['l'] = m_bindings['F' - '@'] = std::bind(&ElementPeerList::activate_display, this, DISPLAY_INFO);
++  m_bindings[KEY_UP]   = m_bindings['k'] = m_bindings['P' - '@'] = std::bind(&ElementPeerList::receive_prev, this);
++  m_bindings[KEY_DOWN] = m_bindings['j'] = m_bindings['N' - '@'] = std::bind(&ElementPeerList::receive_next, this);
+ }
+ 
+ ElementPeerList::~ElementPeerList() {
+diff -ruN orig/src/ui/element_text.cc patched/src/ui/element_text.cc
+--- orig/src/ui/element_text.cc	2016-05-27 16:23:15.410293102 +0200
++++ patched/src/ui/element_text.cc	2016-05-27 16:55:48.617797851 +0200
+@@ -5,12 +5,12 @@
+ // it under the terms of the GNU General Public License as published by
+ // the Free Software Foundation; either version 2 of the License, or
+ // (at your option) any later version.
+-// 
++//
+ // This program is distributed in the hope that it will be useful,
+ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ // GNU General Public License for more details.
+-// 
++//
+ // You should have received a copy of the GNU General Public License
+ // along with this program; if not, write to the Free Software
+ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -54,7 +54,8 @@
+   m_columnWidth(0) {
+ 
+   // Move bindings into a function that defines default bindings.
+-  m_bindings[KEY_LEFT] = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
++  m_bindings[KEY_LEFT] = m_bindings['h'] = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
++
+ 
+ //   m_bindings[KEY_UP]    = std::bind(this, &ElementText::entry_prev);
+ //   m_bindings[KEY_DOWN]  = std::bind(this, &ElementText::entry_next);
+diff -ruN orig/src/ui/element_tracker_list.cc patched/src/ui/element_tracker_list.cc
+--- orig/src/ui/element_tracker_list.cc	2016-05-27 16:23:15.410293102 +0200
++++ patched/src/ui/element_tracker_list.cc	2016-05-27 16:55:36.420314788 +0200
+@@ -5,12 +5,12 @@
+ // it under the terms of the GNU General Public License as published by
+ // the Free Software Foundation; either version 2 of the License, or
+ // (at your option) any later version.
+-// 
++//
+ // This program is distributed in the hope that it will be useful,
+ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ // GNU General Public License for more details.
+-// 
++//
+ // You should have received a copy of the GNU General Public License
+ // along with this program; if not, write to the Free Software
+ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -54,13 +54,13 @@
+   m_window(NULL),
+   m_focus(0) {
+ 
+-  m_bindings[KEY_LEFT] = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
++  m_bindings[KEY_LEFT] = m_bindings['h'] = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
+ 
+   m_bindings[' ']      = std::bind(&ElementTrackerList::receive_cycle_group, this);
+   m_bindings['*']      = std::bind(&ElementTrackerList::receive_disable, this);
++  m_bindings[KEY_DOWN] = m_bindings['j'] = m_bindings['N' - '@'] = std::bind(&ElementTrackerList::receive_next, this);
++  m_bindings[KEY_UP]   = m_bindings['k'] = m_bindings['P' - '@'] = std::bind(&ElementTrackerList::receive_prev, this);
+ 
+-  m_bindings[KEY_DOWN] = m_bindings['N' - '@'] = std::bind(&ElementTrackerList::receive_next, this);
+-  m_bindings[KEY_UP]   = m_bindings['P' - '@'] = std::bind(&ElementTrackerList::receive_prev, this);
+ }
+ 
+ void
+@@ -134,7 +134,7 @@
+ 
+   if (m_focus != 0)
+     --m_focus;
+-  else 
++  else
+     m_focus = m_download->download()->tracker_list()->size() - 1;
+ 
+   m_window->mark_dirty();
+diff -ruN orig/src/ui/element_transfer_list.cc patched/src/ui/element_transfer_list.cc
+--- orig/src/ui/element_transfer_list.cc	2016-05-27 16:23:15.410293102 +0200
++++ patched/src/ui/element_transfer_list.cc	2016-05-27 16:54:44.763551473 +0200
+@@ -5,12 +5,12 @@
+ // it under the terms of the GNU General Public License as published by
+ // the Free Software Foundation; either version 2 of the License, or
+ // (at your option) any later version.
+-// 
++//
+ // This program is distributed in the hope that it will be useful,
+ // but WITHOUT ANY WARRANTY; without even the implied warranty of
+ // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ // GNU General Public License for more details.
+-// 
++//
+ // You should have received a copy of the GNU General Public License
+ // along with this program; if not, write to the Free Software
+ // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+@@ -52,10 +52,10 @@
+   m_window(NULL),
+   m_focus(0) {
+ 
+-  m_bindings[KEY_LEFT] = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
++  m_bindings[KEY_LEFT] = m_bindings['h'] = m_bindings['B' - '@'] = std::bind(&slot_type::operator(), &m_slot_exit);
++  m_bindings[KEY_DOWN]  = m_bindings['j'] = std::bind(&ElementTransferList::receive_next, this);
++  m_bindings[KEY_UP]    = m_bindings['k'] = std::bind(&ElementTransferList::receive_prev, this);
+ 
+-  m_bindings[KEY_DOWN]  = std::bind(&ElementTransferList::receive_next, this);
+-  m_bindings[KEY_UP]    = std::bind(&ElementTransferList::receive_prev, this);
+   m_bindings[KEY_NPAGE] = std::bind(&ElementTransferList::receive_pagenext, this);
+   m_bindings[KEY_PPAGE] = std::bind(&ElementTransferList::receive_pageprev, this);
+ }
+@@ -143,7 +143,7 @@
+     m_focus = 0;
+   else if (m_focus + visible / 2 < scrollable)
+     m_focus += visible / 2;
+-  else 
++  else
+     m_focus = scrollable;
+ 
+ //   m_window->mark_dirty();
