@@ -247,12 +247,13 @@ torrent::Object apply_ui_bind_key(rpc::target_type target, const torrent::Object
             return torrent::Object();
     }
 
-    if (!new_binding) {
-        std::string msg = "Replaced key binding";
-        msg += " for " + keydef + " in " + element + " with " + commands.substr(0, 30);
-        if (commands.size() > 30) msg += "...";
-        control->core()->push_log(msg.c_str());
-    }
+    // Replaced key binding messages
+    /*if (!new_binding) {*/
+        //std::string msg = "Replaced key binding";
+        //msg += " for " + keydef + " in " + element + " with " + commands.substr(0, 30);
+        //if (commands.size() > 30) msg += "...";
+        //control->core()->push_log(msg.c_str());
+    /*}*/
 
     return torrent::Object();
 }

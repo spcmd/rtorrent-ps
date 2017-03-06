@@ -8,8 +8,8 @@ _commit=9abcea84c7f7594ef9cc99f151467cf8b718a9c0
 
 pkgname=rtorrent-ps-spcmd
 pkgver=20160310
-pkgrel=4
-pkgdesc="Ncurses BitTorrent client based on libTorrent - rTorrent-git with Pyroscope patches"
+pkgrel=5
+pkgdesc="Ncurses BitTorrent client based on libTorrent - rTorrent-git with Pyroscope and vi keybinding patches"
 #url="https://github.com/pyroscope/rtorrent-ps"
 license=('GPL')
 arch=('i686' 'x86_64')
@@ -37,10 +37,10 @@ md5sums=('SKIP'
          '7a88f8ab5d41242fdf1428de0e2ca182'
          'bd04a0699b80c8042e1cf63a7e0e4222'
          '0a2bbaf74c7160ba33876dcc2f050f14'
-         '75b2f47edad1f27eb0aca495c6474089'
+         '20a8f6dc22792a3c5c6ca327d1d15528'
          'c28cd7ba3041b9b7366316726c850919'
          '1258acfc82c50a8f452ace87fef0b416'
-         'df687be5b328212c9f0fee1589aac408')
+         '60cc79f8a40d24b98618184fe723f561')
 
 pkgver() {
     cd "$srcdir/rtorrent"
